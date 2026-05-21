@@ -1264,6 +1264,7 @@ function addRelease() {
   if (!custom[selKey]) custom[selKey] = [];
   custom[selKey].push(entry);
   saveCustomReleases(custom);
+  searchIndex = null; // refresh search index
 
   render();
   openDayPanel(selKey);
@@ -1275,6 +1276,7 @@ function deleteCustomRelease(key, idx) {
     custom[key].splice(idx, 1);
     if (custom[key].length === 0) delete custom[key];
     saveCustomReleases(custom);
+    searchIndex = null; // refresh search index
     render();
     openDayPanel(key);
   }
@@ -1365,11 +1367,19 @@ let focusedIdx  = -1;
 
 function buildSearchIndex() {
   const idx = [];
-  // All releases
+  // All static releases
   Object.entries(RELEASES).forEach(([dateStr, movies]) => {
     movies.forEach(m => {
       idx.push({ type:'release', title: m.title, date: dateStr,
                  appleId: m.appleId, market: m.market });
+    });
+  });
+  // Custom releases from localStorage
+  const custom = loadCustomReleases();
+  Object.entries(custom).forEach(([dateStr, movies]) => {
+    movies.forEach(m => {
+      idx.push({ type:'release', title: m.title, date: dateStr,
+                 appleId: m.appleId, market: m.market, isCustom: true });
     });
   });
   // All promotion titles
