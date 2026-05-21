@@ -552,6 +552,97 @@
     }
     .add-btn:hover { background: rgba(10,132,255,0.22); }
 
+    .edit-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background .15s, color .15s;
+    }
+    .edit-btn:hover { background: var(--surface3); color: var(--text); }
+
+    .undo-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: rgba(255,214,10,0.1);
+      border: none;
+      color: #ffd60a;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background .15s;
+    }
+    .undo-btn:hover { background: rgba(255,214,10,0.22); }
+
+    .tag-moved {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 3px;
+      background: rgba(255,214,10,0.15);
+      color: #ffd60a;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .move-form {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .move-date-input {
+      flex: 1;
+      background: var(--surface3);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 7px;
+      padding: 6px 9px;
+      color: var(--text);
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      min-width: 0;
+      transition: border-color .15s;
+    }
+    .move-date-input:focus { border-color: var(--purple); }
+
+    .move-confirm-btn {
+      background: var(--purple);
+      border: none;
+      border-radius: 7px;
+      padding: 6px 11px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .move-cancel-btn {
+      background: var(--surface3);
+      border: none;
+      border-radius: 7px;
+      padding: 6px 9px;
+      color: var(--text2);
+      font-size: 11px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
     .del-btn {
       margin-left: auto;
       width: 22px;
@@ -1126,29 +1217,53 @@ function openDayPanel(key) {
     d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 
   const custom = loadCustomReleases();
-  const customCount = (custom[key] || []).length;
-  const staticCount = (RELEASES[key] || []).length;
 
   let body = '';
 
   if (rels.length) {
     body += `<div class="sec-head">🎬 New Releases &nbsp;—&nbsp; ${rels.length} title${rels.length > 1 ? 's' : ''}</div>`;
-    rels.forEach((r, i) => {
-      const isCustom = i >= staticCount;
-      const customIdx = i - staticCount;
-      body += `
-        <div class="movie-item">
-          <div class="mi-icon blue">🎬</div>
-          <div class="mi-body">
-            <div class="mi-name">${r.title}</div>
-            <div class="tags">
-              ${marketTag(r.market)}
-              ${r.appleId ? `<span class="tag-id">ID: ${r.appleId}</span>` : ''}
-              ${isCustom ? `<span class="tag-custom">custom</span>` : ''}
+    rels.forEach(r => {
+      const type      = r._type || 'static';
+      const fromDate  = r._fromDate || key;
+      const safeTitle = r.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const isEditing = editingMove &&
+                        editingMove.fromDate === fromDate &&
+                        editingMove.title === r.title;
+
+      if (isEditing) {
+        body += `
+          <div class="movie-item">
+            <div class="mi-icon blue">🎬</div>
+            <div class="mi-body">
+              <div class="mi-name">${r.title}</div>
+              <div class="move-form">
+                <input class="move-date-input" type="date" id="moveDateInput" value="${fromDate}" />
+                <button class="move-confirm-btn" onclick="confirmMove()">Move ↗</button>
+                <button class="move-cancel-btn" onclick="cancelMove()">Cancel</button>
+              </div>
             </div>
-          </div>
-          ${isCustom ? `<button class="del-btn" onclick="deleteCustomRelease('${key}', ${customIdx})" title="Remove">×</button>` : ''}
-        </div>`;
+          </div>`;
+      } else {
+        const editBtn = `<button class="edit-btn" onclick="startMove('${fromDate}','${safeTitle}',${type==='custom'},${type==='custom'?r._customIdx:-1})" title="Reschedule">✏️</button>`;
+        const delBtn  = type === 'custom'  ? `<button class="del-btn"  onclick="deleteCustomRelease('${key}',${r._customIdx})" title="Remove">×</button>` : '';
+        const undoBtn = type === 'moved'   ? `<button class="undo-btn" onclick="undoMove('${r.originalDate}','${safeTitle}')" title="Undo move">↩</button>` : '';
+        const movedBadge  = type === 'moved'   ? `<span class="tag-moved">↗ from ${fmtShortDate(r.originalDate)}</span>` : '';
+        const customBadge = type === 'custom'  ? `<span class="tag-custom">custom</span>` : '';
+
+        body += `
+          <div class="movie-item">
+            <div class="mi-icon blue">🎬</div>
+            <div class="mi-body">
+              <div class="mi-name">${r.title}</div>
+              <div class="tags">
+                ${marketTag(r.market)}
+                ${r.appleId ? `<span class="tag-id">ID: ${r.appleId}</span>` : ''}
+                ${customBadge}${movedBadge}
+              </div>
+            </div>
+            ${editBtn}${delBtn}${undoBtn}
+          </div>`;
+      }
     });
   }
 
@@ -1245,11 +1360,40 @@ function saveCustomReleases(data) {
   localStorage.setItem('customReleases', JSON.stringify(data));
 }
 
+function loadMovedReleases() {
+  try { return JSON.parse(localStorage.getItem('movedReleases') || '{}'); }
+  catch { return {}; }
+}
+
+function saveMovedReleases(data) {
+  localStorage.setItem('movedReleases', JSON.stringify(data));
+}
+
 function getReleasesForDate(key) {
   const custom = loadCustomReleases();
-  const staticRels = RELEASES[key] || [];
-  const customRels = (custom[key] || []).map(r => ({ ...r, isCustom: true }));
-  return [...staticRels, ...customRels];
+  const moved  = loadMovedReleases();
+
+  // Static releases on this date (excluding ones moved away)
+  const staticRels = (RELEASES[key] || [])
+    .filter(r => !moved[`${key}|${r.title}`])
+    .map(r => ({ ...r, _type: 'static', _fromDate: key }));
+
+  // Static releases moved TO this date from other dates
+  const movedHere = [];
+  Object.entries(moved).forEach(([mk, newDate]) => {
+    if (newDate === key) {
+      const pipeIdx = mk.indexOf('|');
+      const origDate = mk.slice(0, pipeIdx);
+      const title    = mk.slice(pipeIdx + 1);
+      const orig = (RELEASES[origDate] || []).find(r => r.title === title);
+      if (orig) movedHere.push({ ...orig, _type: 'moved', _fromDate: origDate, originalDate: origDate });
+    }
+  });
+
+  // Custom releases for this date
+  const customRels = (custom[key] || []).map((r, i) => ({ ...r, _type: 'custom', _fromDate: key, _customIdx: i }));
+
+  return [...staticRels, ...movedHere, ...customRels];
 }
 
 function addRelease() {
@@ -1280,6 +1424,66 @@ function deleteCustomRelease(key, idx) {
     render();
     openDayPanel(key);
   }
+}
+
+/* ── MOVE RELEASE ─────────────────────────────────────────── */
+let editingMove = null; // { fromDate, title, isCustom, customIdx }
+
+function fmtShortDate(dateStr) {
+  return new Date(dateStr + 'T12:00:00')
+    .toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function startMove(fromDate, title, isCustom, customIdx) {
+  editingMove = { fromDate, title, isCustom, customIdx };
+  openDayPanel(selKey);
+}
+
+function cancelMove() {
+  editingMove = null;
+  openDayPanel(selKey);
+}
+
+function confirmMove() {
+  const input = document.getElementById('moveDateInput');
+  if (!input || !editingMove) return;
+  const toDate = input.value;
+  if (!toDate) return;
+  performMove(editingMove.fromDate, editingMove.title, toDate,
+              editingMove.isCustom, editingMove.customIdx);
+}
+
+function performMove(fromDate, title, toDate, isCustom, customIdx) {
+  if (fromDate === toDate) { editingMove = null; openDayPanel(selKey); return; }
+
+  if (isCustom) {
+    const custom = loadCustomReleases();
+    const releases = custom[fromDate] || [];
+    const release  = releases.splice(customIdx, 1)[0];
+    if (!release) { editingMove = null; return; }
+    if (!custom[fromDate].length) delete custom[fromDate];
+    if (!custom[toDate]) custom[toDate] = [];
+    custom[toDate].push(release);
+    saveCustomReleases(custom);
+  } else {
+    const moved = loadMovedReleases();
+    moved[`${fromDate}|${title}`] = toDate;
+    saveMovedReleases(moved);
+  }
+
+  editingMove  = null;
+  searchIndex  = null;
+  render();
+  openDayPanel(toDate);
+}
+
+function undoMove(origDate, title) {
+  const moved = loadMovedReleases();
+  delete moved[`${origDate}|${title}`];
+  saveMovedReleases(moved);
+  searchIndex = null;
+  render();
+  openDayPanel(origDate);
 }
 
 function copyBlockAll(ids) {
@@ -1367,11 +1571,15 @@ let focusedIdx  = -1;
 
 function buildSearchIndex() {
   const idx = [];
-  // All static releases
+  // All static releases (respecting move overrides)
+  const moved = loadMovedReleases();
   Object.entries(RELEASES).forEach(([dateStr, movies]) => {
     movies.forEach(m => {
-      idx.push({ type:'release', title: m.title, date: dateStr,
-                 appleId: m.appleId, market: m.market });
+      const mk = `${dateStr}|${m.title}`;
+      const actualDate = moved[mk] || dateStr;
+      idx.push({ type:'release', title: m.title, date: actualDate,
+                 appleId: m.appleId, market: m.market,
+                 ...(moved[mk] ? { originalDate: dateStr } : {}) });
     });
   });
   // Custom releases from localStorage
