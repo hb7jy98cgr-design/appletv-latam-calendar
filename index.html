@@ -1547,6 +1547,7 @@ function toggleCinephile(title) {
 
 function addRelease() {
   const titleEl  = document.getElementById('addTitle');
+  const marketEl = document.getElementById('addMarket');
   const idEl     = document.getElementById('addAppleId');
   const title    = titleEl.value.trim();
   if (!title) { titleEl.focus(); return; }
