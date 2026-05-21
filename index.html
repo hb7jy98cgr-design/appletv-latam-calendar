@@ -552,6 +552,50 @@
     }
     .add-btn:hover { background: rgba(10,132,255,0.22); }
 
+    /* ── PRIORITY ────────────────────────────────────────────── */
+    .cell { position: relative; }
+
+    .cell-prio-star {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      font-size: 11px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .star-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform .15s;
+      filter: grayscale(1) opacity(0.35);
+    }
+    .star-btn:hover        { transform: scale(1.25); filter: grayscale(0); }
+    .star-btn.starred      { filter: grayscale(0); }
+
+    .movie-item.priority {
+      background: rgba(255,214,10,0.07);
+      border: 1px solid rgba(255,214,10,0.22);
+      border-radius: 9px;
+    }
+
+    .tag-priority {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255,214,10,0.15);
+      color: #ffd60a;
+    }
+
     .edit-btn {
       width: 26px;
       height: 26px;
@@ -1166,6 +1210,7 @@ function render() {
     const isToday = y === TODAY.getFullYear() && m === TODAY.getMonth() && d === TODAY.getDate();
     const hasRel  = rels.length > 0;
     const hasPrm  = promos.length > 0;
+    const hasPrio = rels.some(r => isPriority(r.title));
 
     let cls = 'cell clickable';
     if (hasRel)  cls += ' has-rel';
@@ -1181,16 +1226,20 @@ function render() {
       inner += `<div class="cell-num">${d}</div>`;
     }
 
+    // Priority star indicator
+    if (hasPrio) inner += `<span class="cell-prio-star">⭐</span>`;
+
     // Promo chip on Thursdays
     if (hasPrm) {
       inner += `<div class="chip chip-promo">🏷️ ${promos[0].name}</div>`;
     }
 
-    // Release chips
+    // Release chips — starred first
     if (hasRel) {
-      const visible = rels.slice(0, hasPrm ? 1 : 2);
+      const sorted  = [...rels].sort((a,b) => (isPriority(b.title)?1:0) - (isPriority(a.title)?1:0));
+      const visible = sorted.slice(0, hasPrm ? 1 : 2);
       visible.forEach(r => {
-        inner += `<div class="chip chip-rel">🎬 ${r.title}</div>`;
+        inner += `<div class="chip chip-rel">${isPriority(r.title)?'⭐':'🎬'} ${r.title}</div>`;
       });
       if (rels.length > visible.length) {
         inner += `<div class="chip-more">+${rels.length - visible.length} more</div>`;
@@ -1221,11 +1270,15 @@ function openDayPanel(key) {
   let body = '';
 
   if (rels.length) {
+    // Sort: starred first
+    rels.sort((a, b) => (isPriority(b.title) ? 1 : 0) - (isPriority(a.title) ? 1 : 0));
+
     body += `<div class="sec-head">🎬 New Releases &nbsp;—&nbsp; ${rels.length} title${rels.length > 1 ? 's' : ''}</div>`;
     rels.forEach(r => {
       const type      = r._type || 'static';
       const fromDate  = r._fromDate || key;
       const safeTitle = r.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const starred   = isPriority(r.title);
       const isEditing = editingMove &&
                         editingMove.fromDate === fromDate &&
                         editingMove.title === r.title;
@@ -1244,14 +1297,15 @@ function openDayPanel(key) {
             </div>
           </div>`;
       } else {
-        const editBtn = `<button class="edit-btn" onclick="startMove('${fromDate}','${safeTitle}',${type==='custom'},${type==='custom'?r._customIdx:-1})" title="Reschedule">✏️</button>`;
-        const delBtn  = type === 'custom'  ? `<button class="del-btn"  onclick="deleteCustomRelease('${key}',${r._customIdx})" title="Remove">×</button>` : '';
-        const undoBtn = type === 'moved'   ? `<button class="undo-btn" onclick="undoMove('${r.originalDate}','${safeTitle}')" title="Undo move">↩</button>` : '';
-        const movedBadge  = type === 'moved'   ? `<span class="tag-moved">↗ from ${fmtShortDate(r.originalDate)}</span>` : '';
-        const customBadge = type === 'custom'  ? `<span class="tag-custom">custom</span>` : '';
+        const starBtn  = `<button class="star-btn ${starred?'starred':''}" onclick="togglePriority('${safeTitle}')" title="${starred?'Remove priority':'Mark as priority'}">⭐</button>`;
+        const editBtn  = `<button class="edit-btn" onclick="startMove('${fromDate}','${safeTitle}',${type==='custom'},${type==='custom'?r._customIdx:-1})" title="Reschedule">✏️</button>`;
+        const delBtn   = type === 'custom' ? `<button class="del-btn"  onclick="deleteCustomRelease('${key}',${r._customIdx})" title="Remove">×</button>` : '';
+        const undoBtn  = type === 'moved'  ? `<button class="undo-btn" onclick="undoMove('${r.originalDate}','${safeTitle}')" title="Undo move">↩</button>` : '';
+        const movedBadge  = type === 'moved'  ? `<span class="tag-moved">↗ from ${fmtShortDate(r.originalDate)}</span>` : '';
+        const customBadge = type === 'custom' ? `<span class="tag-custom">custom</span>` : '';
 
         body += `
-          <div class="movie-item">
+          <div class="movie-item${starred?' priority':''}">
             <div class="mi-icon blue">🎬</div>
             <div class="mi-body">
               <div class="mi-name">${r.title}</div>
@@ -1261,7 +1315,7 @@ function openDayPanel(key) {
                 ${customBadge}${movedBadge}
               </div>
             </div>
-            ${editBtn}${delBtn}${undoBtn}
+            ${starBtn}${editBtn}${delBtn}${undoBtn}
           </div>`;
       }
     });
@@ -1396,9 +1450,31 @@ function getReleasesForDate(key) {
   return [...staticRels, ...movedHere, ...customRels];
 }
 
+/* ── PRIORITY RELEASES ────────────────────────────────────── */
+function loadPriorities() {
+  try { return new Set(JSON.parse(localStorage.getItem('priorityReleases') || '[]')); }
+  catch { return new Set(); }
+}
+
+function savePriorities(set) {
+  localStorage.setItem('priorityReleases', JSON.stringify([...set]));
+}
+
+function isPriority(title) {
+  return loadPriorities().has(title);
+}
+
+function togglePriority(title) {
+  const prios = loadPriorities();
+  prios.has(title) ? prios.delete(title) : prios.add(title);
+  savePriorities(prios);
+  searchIndex = null;
+  render();
+  openDayPanel(selKey);
+}
+
 function addRelease() {
   const titleEl  = document.getElementById('addTitle');
-  const marketEl = document.getElementById('addMarket');
   const idEl     = document.getElementById('addAppleId');
   const title    = titleEl.value.trim();
   if (!title) { titleEl.focus(); return; }
@@ -1578,7 +1654,7 @@ function buildSearchIndex() {
       const mk = `${dateStr}|${m.title}`;
       const actualDate = moved[mk] || dateStr;
       idx.push({ type:'release', title: m.title, date: actualDate,
-                 appleId: m.appleId, market: m.market,
+                 appleId: m.appleId, market: m.market, priority: isPriority(m.title),
                  ...(moved[mk] ? { originalDate: dateStr } : {}) });
     });
   });
@@ -1666,9 +1742,9 @@ function onSearchInput(e) {
     rels.slice(0, 12).forEach(r => {
       html += `
         <div class="result-item" onclick="goToResult('${r.date}')" data-date="${r.date}">
-          <div class="result-item-icon rel">🎬</div>
+          <div class="result-item-icon rel">${r.priority ? '⭐' : '🎬'}</div>
           <div class="result-item-body">
-            <div class="result-item-title">${r.title}</div>
+            <div class="result-item-title">${r.priority ? '⭐ ' : ''}${r.title}</div>
             <div class="result-item-sub">${fmtResultDate(r.date)}${r.market ? ' · ' + r.market : ''}</div>
           </div>
           ${r.appleId ? `<span class="result-item-id">${r.appleId}</span>` : ''}
