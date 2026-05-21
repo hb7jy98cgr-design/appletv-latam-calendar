@@ -596,6 +596,44 @@
       color: #ffd60a;
     }
 
+    .cine-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform .15s;
+      filter: grayscale(1) opacity(0.35);
+    }
+    .cine-btn:hover   { transform: scale(1.25); filter: grayscale(0); }
+    .cine-btn.cinephiled { filter: grayscale(0); }
+
+    .movie-item.cinephile {
+      background: rgba(255,55,95,0.07);
+      border: 1px solid rgba(255,55,95,0.22);
+      border-radius: 9px;
+    }
+
+    .movie-item.priority.cinephile {
+      background: linear-gradient(135deg, rgba(255,214,10,0.07), rgba(255,55,95,0.07));
+      border-color: rgba(255,214,10,0.22);
+    }
+
+    .cell-cine-mark {
+      position: absolute;
+      bottom: 7px;
+      right: 7px;
+      font-size: 11px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
     .edit-btn {
       width: 26px;
       height: 26px;
@@ -1211,6 +1249,7 @@ function render() {
     const hasRel  = rels.length > 0;
     const hasPrm  = promos.length > 0;
     const hasPrio = rels.some(r => isPriority(r.title));
+    const hasCine = rels.some(r => isCinephile(r.title));
 
     let cls = 'cell clickable';
     if (hasRel)  cls += ' has-rel';
@@ -1228,6 +1267,8 @@ function render() {
 
     // Priority star indicator
     if (hasPrio) inner += `<span class="cell-prio-star">⭐</span>`;
+    // Cinephile indicator (bottom-right corner)
+    if (hasCine) inner += `<span class="cell-cine-mark">🎞️</span>`;
 
     // Promo chip on Thursdays
     if (hasPrm) {
@@ -1279,6 +1320,7 @@ function openDayPanel(key) {
       const fromDate  = r._fromDate || key;
       const safeTitle = r.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       const starred   = isPriority(r.title);
+      const cinephile = isCinephile(r.title);
       const isEditing = editingMove &&
                         editingMove.fromDate === fromDate &&
                         editingMove.title === r.title;
@@ -1298,14 +1340,21 @@ function openDayPanel(key) {
           </div>`;
       } else {
         const starBtn  = `<button class="star-btn ${starred?'starred':''}" onclick="togglePriority('${safeTitle}')" title="${starred?'Remove priority':'Mark as priority'}">⭐</button>`;
+        const cineBtn  = `<button class="cine-btn ${cinephile?'cinephiled':''}" onclick="toggleCinephile('${safeTitle}')" title="${cinephile?'Remove cinephile pick':'My cinephile pick'}">🎞️</button>`;
         const editBtn  = `<button class="edit-btn" onclick="startMove('${fromDate}','${safeTitle}',${type==='custom'},${type==='custom'?r._customIdx:-1})" title="Reschedule">✏️</button>`;
         const delBtn   = type === 'custom' ? `<button class="del-btn"  onclick="deleteCustomRelease('${key}',${r._customIdx})" title="Remove">×</button>` : '';
         const undoBtn  = type === 'moved'  ? `<button class="undo-btn" onclick="undoMove('${r.originalDate}','${safeTitle}')" title="Undo move">↩</button>` : '';
         const movedBadge  = type === 'moved'  ? `<span class="tag-moved">↗ from ${fmtShortDate(r.originalDate)}</span>` : '';
         const customBadge = type === 'custom' ? `<span class="tag-custom">custom</span>` : '';
 
+        const itemClass = [
+          'movie-item',
+          starred   ? 'priority'  : '',
+          cinephile ? 'cinephile' : ''
+        ].filter(Boolean).join(' ');
+
         body += `
-          <div class="movie-item${starred?' priority':''}">
+          <div class="${itemClass}">
             <div class="mi-icon blue">🎬</div>
             <div class="mi-body">
               <div class="mi-name">${r.title}</div>
@@ -1315,7 +1364,7 @@ function openDayPanel(key) {
                 ${customBadge}${movedBadge}
               </div>
             </div>
-            ${starBtn}${editBtn}${delBtn}${undoBtn}
+            ${starBtn}${cineBtn}${editBtn}${delBtn}${undoBtn}
           </div>`;
       }
     });
@@ -1468,6 +1517,29 @@ function togglePriority(title) {
   const prios = loadPriorities();
   prios.has(title) ? prios.delete(title) : prios.add(title);
   savePriorities(prios);
+  searchIndex = null;
+  render();
+  openDayPanel(selKey);
+}
+
+/* ── CINEPHILE PICKS ──────────────────────────────────────── */
+function loadCinephile() {
+  try { return new Set(JSON.parse(localStorage.getItem('cinephileReleases') || '[]')); }
+  catch { return new Set(); }
+}
+
+function saveCinephile(set) {
+  localStorage.setItem('cinephileReleases', JSON.stringify([...set]));
+}
+
+function isCinephile(title) {
+  return loadCinephile().has(title);
+}
+
+function toggleCinephile(title) {
+  const picks = loadCinephile();
+  picks.has(title) ? picks.delete(title) : picks.add(title);
+  saveCinephile(picks);
   searchIndex = null;
   render();
   openDayPanel(selKey);
