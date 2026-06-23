@@ -1158,9 +1158,9 @@
 /* ── DATA loaded from calendar-data.js ───────────────────── */
 
 /* ── STATE ────────────────────────────────────────────────── */
-const TODAY  = new Date(2026, 4, 20); // May 20 2026
-let curYear  = 2026;
-let curMonth = 5;        // 0-indexed → June
+const TODAY  = new Date(); // always the actual current date
+let curYear  = TODAY.getFullYear();
+let curMonth = TODAY.getMonth();        // always open on current month
 let selKey   = null;
 
 /* ── UTILS ────────────────────────────────────────────────── */
