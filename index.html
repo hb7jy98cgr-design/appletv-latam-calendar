@@ -1315,6 +1315,22 @@ function openDayPanel(key) {
     rels.sort((a, b) => (isPriority(b.title) ? 1 : 0) - (isPriority(a.title) ? 1 : 0));
 
     body += `<div class="sec-head">🎬 New Releases &nbsp;—&nbsp; ${rels.length} title${rels.length > 1 ? 's' : ''}</div>`;
+
+    // ── Copy block for release Apple IDs ─────────────────────
+    const relIds = rels.map(r => r.appleId).filter(Boolean);
+    if (relIds.length) {
+      const idsPlain = relIds.join('\n');
+      const idsArr   = relIds.join(',');
+      body += `
+        <div class="copy-block" style="border-color:var(--blue-border);background:var(--blue-bg);margin-bottom:14px;">
+          <div class="copy-block-header" style="background:rgba(10,132,255,0.08);">
+            <span class="copy-block-label" style="color:var(--blue);">🎬 Release IDs — ${relIds.length} of ${rels.length} titles</span>
+            <button class="copy-btn" style="border-color:var(--blue-border);background:var(--blue-bg);color:var(--blue);"
+              onclick="copyIds(this, [${idsArr}])">⎘ Copy All</button>
+          </div>
+          <div class="id-list-pre">${idsPlain}</div>
+        </div>`;
+    }
     rels.forEach(r => {
       const type      = r._type || 'static';
       const fromDate  = r._fromDate || key;
