@@ -484,6 +484,74 @@
       overflow-y: auto;
     }
 
+    .add-promo-form {
+      background: var(--surface2);
+      border: 1px dashed var(--orange-border);
+      border-radius: 9px;
+      padding: 13px;
+      margin-top: 12px;
+    }
+    .add-promo-form .add-form-title { color: var(--orange); }
+
+    .add-textarea {
+      width: 100%;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 12px;
+      font-family: 'SF Mono','Menlo',monospace;
+      outline: none;
+      margin-bottom: 7px;
+      resize: vertical;
+      min-height: 80px;
+      transition: border-color .15s;
+      line-height: 1.6;
+    }
+    .add-textarea:focus { border-color: var(--orange); }
+    .add-textarea::placeholder { font-family: inherit; color: var(--text3); }
+
+    .add-btn-promo {
+      width: 100%;
+      background: var(--orange-bg);
+      border: 1px solid var(--orange-border);
+      border-radius: 7px;
+      padding: 8px;
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+    }
+    .add-btn-promo:hover { background: rgba(255,159,10,0.22); }
+
+    .del-promo-btn {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255,69,58,0.1);
+      border: none;
+      color: #ff453a;
+      cursor: pointer;
+      margin-left: 6px;
+      transition: background .15s;
+    }
+    .del-promo-btn:hover { background: rgba(255,69,58,0.25); }
+
+    .tag-custom-promo {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 3px;
+      background: rgba(255,159,10,0.15);
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
     /* ── ADD RELEASE FORM ───────────────────────────────── */
     .add-form {
       background: var(--surface2);
@@ -1124,6 +1192,9 @@
     <button class="search-btn" onclick="openSearch()">
       🔍 Search <kbd>⌘K</kbd>
     </button>
+    <button class="search-btn" onclick="openAddPromoPanel()" style="border-color:var(--orange-border);color:var(--orange);">
+      🏷️ Add Promo
+    </button>
   </div>
 </header>
 
@@ -1176,13 +1247,13 @@ function parseKey(k) { return new Date(k + 'T12:00:00'); }
 
 function inPromoRange(k) {
   const d = parseKey(k);
-  return PROMOTIONS.some(p => d >= parseKey(p.start) && d <= parseKey(p.end));
+  return getAllPromos().some(p => d >= parseKey(p.start) && d <= parseKey(p.end));
 }
 
 function promosOnThursday(k) {
   const d = parseKey(k);
   if (d.getDay() !== 4) return [];
-  return PROMOTIONS.filter(p => d >= parseKey(p.start) && d <= parseKey(p.end));
+  return getAllPromos().filter(p => d >= parseKey(p.start) && d <= parseKey(p.end));
 }
 
 function marketTag(m) {
@@ -1561,6 +1632,105 @@ function toggleCinephile(title) {
   openDayPanel(selKey);
 }
 
+/* ── CUSTOM PROMOS (localStorage) ────────────────────────── */
+function loadCustomPromos() {
+  try { return JSON.parse(localStorage.getItem('customPromos') || '[]'); }
+  catch { return []; }
+}
+
+function saveCustomPromos(arr) {
+  localStorage.setItem('customPromos', JSON.stringify(arr));
+}
+
+function getAllPromos() {
+  return [...PROMOTIONS, ...loadCustomPromos().map(p => ({ ...p, isCustom: true }))];
+}
+
+function addCustomPromo() {
+  const name    = document.getElementById('promoName').value.trim();
+  const studio  = document.getElementById('promoStudio').value.trim();
+  const start   = document.getElementById('promoStart').value;
+  const end     = document.getElementById('promoEnd').value;
+  const rawText = document.getElementById('promoTitles').value.trim();
+
+  if (!name || !start || !end || !rawText) {
+    alert('Please fill in name, dates and at least one title.'); return;
+  }
+
+  const titles = rawText.split('\n').map(line => {
+    const parts = line.split('|').map(s => s.trim());
+    const title   = parts[0] || '';
+    const appleId = parts[1] ? (parseInt(parts[1]) || null) : null;
+    return { title, appleId, tier: null };
+  }).filter(t => t.title.length > 0);
+
+  if (!titles.length) { alert('No valid titles found.'); return; }
+
+  const promos = loadCustomPromos();
+  promos.push({ name, studio, start, end, titles });
+  saveCustomPromos(promos);
+  searchIndex = null;
+  render();
+  // Open the first Thursday of the promo to show it
+  const d = new Date(start + 'T12:00:00');
+  curYear  = d.getFullYear();
+  curMonth = d.getMonth();
+  render();
+  closePanel();
+}
+
+function deleteCustomPromo(idx) {
+  const promos = loadCustomPromos();
+  promos.splice(idx, 1);
+  saveCustomPromos(promos);
+  searchIndex = null;
+  render();
+  openAddPromoPanel();
+}
+
+function openAddPromoPanel() {
+  selKey = null;
+  document.getElementById('panelLabel').textContent   = 'PROMOTIONS';
+  document.getElementById('panelHeading').textContent = 'Add Custom Promo';
+
+  const customs = loadCustomPromos();
+  let body = '';
+
+  // List existing custom promos
+  if (customs.length) {
+    body += `<div class="sec-head">🏷️ Custom Promotions (${customs.length})</div>`;
+    customs.forEach((p, i) => {
+      body += `
+        <div class="movie-item" style="background:var(--orange-bg);border:1px solid var(--orange-border);">
+          <div class="mi-icon orange">🏷️</div>
+          <div class="mi-body">
+            <div class="mi-name">${p.name} <span class="tag-custom-promo">custom</span></div>
+            <div class="result-item-sub">${p.start} → ${p.end} · ${p.titles.length} titles${p.studio ? ' · ' + p.studio : ''}</div>
+          </div>
+          <button class="del-promo-btn" onclick="deleteCustomPromo(${i})">× Remove</button>
+        </div>`;
+    });
+  }
+
+  // Add form
+  body += `
+    <div class="add-promo-form">
+      <div class="add-form-title">➕ Add Custom Promotion</div>
+      <input class="add-input" id="promoName"   type="text" placeholder="Promotion name…" />
+      <input class="add-input" id="promoStudio" type="text" placeholder="Studio (opt.)" />
+      <div class="add-row">
+        <input class="add-input" id="promoStart" type="date" style="flex:1;margin-bottom:0;" />
+        <input class="add-input" id="promoEnd"   type="date" style="flex:1;margin-bottom:0;" />
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin:6px 0 4px;">Titles — one per line, format: <code style="color:var(--orange)">Title | AppleID</code></div>
+      <textarea class="add-textarea" id="promoTitles" placeholder="Mad Max: Fury Road | 990549112&#10;Tenet | 1538251548&#10;Inception (no ID yet)"></textarea>
+      <button class="add-btn-promo" onclick="addCustomPromo()">+ Add to Calendar</button>
+    </div>`;
+
+  document.getElementById('panelBody').innerHTML = body;
+  showPanel();
+}
+
 function addRelease() {
   const titleEl  = document.getElementById('addTitle');
   const marketEl = document.getElementById('addMarket');
@@ -1755,8 +1925,8 @@ function buildSearchIndex() {
                  appleId: m.appleId, market: m.market, isCustom: true });
     });
   });
-  // All promotion titles
-  PROMOTIONS.forEach(p => {
+  // All promotion titles (static + custom)
+  getAllPromos().forEach(p => {
     p.titles.forEach(t => {
       idx.push({ type:'promo', title: t.title, promoName: p.name,
                  date: p.start, endDate: p.end, appleId: t.appleId });
