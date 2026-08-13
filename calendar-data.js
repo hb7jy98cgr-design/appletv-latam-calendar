@@ -80,6 +80,7 @@ const RELEASES = {
     { title: 'The Magician\'s Raincoat', market: null, appleId: 1869286496 },
     { title: 'Mutant', market: null, appleId: 1869289201 },
     { title: 'The Magician\'s Raincoat', market: null, appleId: 1869286496 },
+    { title: 'The Magician\'s Raincoat', market: '2024.0', appleId: 1869286496 },
   ],
   '2026-02-18': [
     { title: 'The Dark Fairy', market: null, appleId: 1870655403 },
@@ -91,6 +92,7 @@ const RELEASES = {
     { title: 'Escape', market: null, appleId: 1871189675 },
     { title: 'Vicino Al Verbo', market: null, appleId: 1871451355 },
     { title: 'I\'ll Crush Y’All aka Os reviento', market: null, appleId: 1874609640 },
+    { title: 'I\'ll Crush Y’All aka Os reviento', market: '2023.0', appleId: 1874609640 },
   ],
   '2026-02-25': [
     { title: 'Auxilio', market: null, appleId: 1871475638 },
@@ -99,6 +101,7 @@ const RELEASES = {
     { title: 'It\'s Coming', market: null, appleId: 1871483299 },
     { title: 'Terrestrial', market: null, appleId: 1871484450 },
     { title: 'It\'s Coming', market: null, appleId: 1871483299 },
+    { title: 'It\'s Coming', market: '2023.0', appleId: 1871483299 },
   ],
   '2026-02-26': [
     { title: 'Troll Factory', market: null, appleId: 1872758408 },
@@ -153,6 +156,7 @@ const RELEASES = {
     { title: 'Decade of the Dead', market: null, appleId: 1882016369 },
     { title: 'Paranormal Justice', market: null, appleId: 1879814873 },
     { title: 'A Knight\'s War', market: null, appleId: 1880690141 },
+    { title: 'A Knight\'s War', market: '2025.0', appleId: 1880690141 },
   ],
   '2026-03-26': [
     { title: 'A Great Divide', market: null, appleId: 1882017807 },
@@ -175,6 +179,7 @@ const RELEASES = {
     { title: 'The Great One', market: null, appleId: 1883803944 },
     { title: 'Like A Rolling Stone', market: null, appleId: 1884006433 },
     { title: 'A Mother\'s Special Love', market: null, appleId: 1882832423 },
+    { title: 'A Mother\'s Special Love', market: '2024.0', appleId: 1882832423 },
   ],
   '2026-04-08': [
     { title: 'The Plantation', market: null, appleId: 1878657701 },
@@ -209,6 +214,7 @@ const RELEASES = {
     { title: 'Do Not Open', market: null, appleId: 1885900420 },
     { title: 'Finster (The Notorious Finster)', market: null, appleId: 1868370328 },
     { title: 'He Sees You When You\'re Sleeping', market: null, appleId: 1885894580 },
+    { title: 'He Sees You When You\'re Sleeping', market: '2024.0', appleId: 1885894580 },
   ],
   '2026-04-23': [
     { title: 'The Vanishing Soldier', market: null, appleId: 1885925881 },
@@ -217,6 +223,7 @@ const RELEASES = {
     { title: 'Sentinel', market: null, appleId: 1867772261 },
     { title: 'Die\'ced: Reloaded', market: null, appleId: 1867777665 },
     { title: 'Die\'ced: Reloaded', market: null, appleId: 1867777665 },
+    { title: 'Die\'ced: Reloaded', market: '2025.0', appleId: 1867777665 },
   ],
   '2026-04-29': [
     { title: 'Wellwood', market: null, appleId: 1868370328 },
@@ -242,6 +249,7 @@ const RELEASES = {
     { title: 'Young Eagles', market: null, appleId: 1861788150 },
     { title: 'Fight for Tomorrow', market: null, appleId: 1893978660 },
     { title: 'I Call Them \'Souls', market: null, appleId: 1891761541 },
+    { title: 'I Call Them \'Souls', market: '2025.0', appleId: 1891761541 },
   ],
   '2026-05-13': [
     { title: 'Touched By Eternity', market: null, appleId: 1891738440 },
@@ -253,6 +261,7 @@ const RELEASES = {
     { title: 'Capitão Astúcia', market: null, appleId: 1895259601 },
     { title: 'Girl on Edge', market: null, appleId: 1893688539 },
     { title: 'Who\'s Yer Father?', market: null, appleId: 1893328632 },
+    { title: 'Who\'s Yer Father?', market: '2023.0', appleId: 1893328632 },
   ],
   '2026-05-21': [
     { title: 'Lapua 1976', market: null, appleId: 1893358093 },
@@ -261,6 +270,7 @@ const RELEASES = {
     { title: 'A Tooth Fairy Tale', market: null, appleId: 1895133640 },
     { title: 'Dark Nuns', market: null, appleId: 1895850198 },
     { title: 'Assassin\'s Guild', market: null, appleId: 1893362377 },
+    { title: 'Assassin\'s Guild', market: '2024.0', appleId: 1893362377 },
   ],
   '2026-05-28': [
     { title: 'Menudas Piezas aka Checkmates', market: null, appleId: 1893369261 },
@@ -278,6 +288,7 @@ const RELEASES = {
     { title: 'Thieves Highway', market: null, appleId: 1896767337 },
     { title: 'The Mad Game', market: null, appleId: 1896657993 },
     { title: 'Frieda\'s Case', market: null, appleId: 1896300165 },
+    { title: 'Frieda\'s Case', market: '2024.0', appleId: 1896300165 },
   ],
   '2026-06-11': [
     { title: 'My Otaku Girlfriend', market: null, appleId: 1896815432 },
@@ -320,6 +331,7 @@ const RELEASES = {
     { title: 'Condition of Return', market: null, appleId: null },
     { title: 'Lampo the Travelling Dog aka O psie, ktory jezdzil koleja', market: null, appleId: null },
     { title: 'Clutch', market: null, appleId: null },
+    { title: 'Junction', market: '2024.0', appleId: 1884085145 },
   ],
   '2026-07-16': [
     { title: 'Backrooms', market: 'MX + PL', appleId: 6786377189 },
@@ -381,6 +393,9 @@ const RELEASES = {
     { title: 'Depth of Field', market: null, appleId: null },
     { title: 'Everything About You', market: null, appleId: null },
     { title: 'Sin Instrucciones', market: null, appleId: null },
+    { title: 'El Placer Es Mio', market: '2024.0', appleId: 6790789393 },
+    { title: 'Raptus', market: '2025.0', appleId: 6788030392 },
+    { title: 'The Shadow\'s Edge', market: '2025.0', appleId: 6788378807 },
   ],
   '2026-08-13': [
     { title: 'Avignon', market: 'MX only', appleId: null },
@@ -392,6 +407,8 @@ const RELEASES = {
     { title: 'La Vie Pour de Vrai aka Life for Real', market: null, appleId: null },
     { title: 'Daniela Forever', market: null, appleId: null },
     { title: 'Hitmen', market: null, appleId: null },
+    { title: 'Molli and Max In The Future', market: '2023.0', appleId: 6791213397 },
+    { title: 'Ghost Train', market: '2025.0', appleId: 6789609141 },
   ],
   '2026-08-20': [
     { title: 'The Cut', market: 'MX + PL', appleId: 1841509683 },
@@ -404,6 +421,10 @@ const RELEASES = {
     { title: 'Broken | Fragmentada', market: null, appleId: null },
     { title: 'Resurrection Road', market: null, appleId: null },
     { title: 'Krispr', market: null, appleId: null },
+    { title: 'Pretty Crazy', market: '2025.0', appleId: 6793945634 },
+    { title: 'Memories Of Space And Time', market: '2026.0', appleId: 6795551233 },
+    { title: 'Monkey´s Magic Merry Go Round', market: '2024.0', appleId: 1877111369 },
+    { title: 'Ogiva: O Mundo Não é Mais Nosso', market: '2024.0', appleId: 6796011136 },
   ],
   '2026-08-27': [
     { title: 'Oh, Canada', market: 'MX + PL', appleId: 1823754800 },
@@ -413,12 +434,74 @@ const RELEASES = {
     { title: 'Conviction', market: null, appleId: 1861818568 },
     { title: 'Gone Running', market: null, appleId: null },
     { title: 'Caída Libre aka Free Falling', market: null, appleId: null },
+    { title: 'The Flicker/Mertsanie', market: '2023.0', appleId: 6793536383 },
+    { title: 'The Mortuary Assistant', market: '2026.0', appleId: 6791978539 },
+    { title: 'Here Comes a New Challenger', market: '2023.0', appleId: 6793544456 },
   ],
   '2026-07-27': [
     { title: 'Borrón y vida nueva', market: 'MX + PL', appleId: 1876670717 },
   ],
   '2026-08-04': [
     { title: 'On the Road', market: 'MX only', appleId: null },
+  ],
+  '2026-09-10': [
+    { title: 'Chick Flick', market: '2023.0', appleId: 6786359963 },
+    { title: 'The Squad', market: '2023.0', appleId: 6789615667 },
+    { title: 'Forever Young', market: '2023.0', appleId: null },
+    { title: 'Un Noël en Famille aka Christmas Carole', market: '2024.0', appleId: 6798285753 },
+    { title: 'Take My Hand', market: '2024.0', appleId: 6800712347 },
+    { title: 'Carpenter’s Prayer', market: '2024.0', appleId: null },
+    { title: 'Pink Lady', market: '2024.0', appleId: 6796009166 },
+    { title: 'Winterset', market: '2025.0', appleId: null },
+    { title: 'L\'Invenzione di Noi Due', market: '2024.0', appleId: 6798294611 },
+    { title: 'Speed Faster', market: '2026.0', appleId: 1740124940 },
+    { title: 'Killer Whale', market: '2026.0', appleId: null },
+  ],
+  '2026-09-17': [
+    { title: 'Above the Knee', market: '2024.0', appleId: 6796313198 },
+    { title: 'Animal Within', market: '2022.0', appleId: 6797520086 },
+    { title: 'Hidden Within', market: '2023.0', appleId: 6800715783 },
+    { title: 'The Ex-idol, Stuck in Life, Decided to Live with a Complete Stranger', market: '2023.0', appleId: null },
+    { title: 'The Thief', market: '2023.0', appleId: null },
+    { title: 'Reckless', market: '2026.0', appleId: null },
+    { title: 'Incarnation', market: '2025.0', appleId: null },
+  ],
+  '2026-09-24': [
+    { title: 'Napalm Girl. The Journey of a photo', market: '2023.0', appleId: null },
+    { title: 'Salon de Seoul', market: '2023.0', appleId: 6798298169 },
+    { title: 'Volare', market: '2023.0', appleId: 6798301128 },
+  ],
+  '2026-10-01': [
+    { title: 'Food for Profit', market: '2024.0', appleId: null },
+    { title: 'The Rooster', market: '2023.0', appleId: null },
+    { title: 'Uproar', market: '2023.0', appleId: null },
+    { title: 'The Collector: Mirrored Nightmares aka La Coleccionista: Mundos Paralelos', market: '2025.0', appleId: null },
+  ],
+  '2026-10-08': [
+    { title: 'Future TX', market: '2022.0', appleId: 1866679953 },
+    { title: 'Dikkie Dik en de verdwenen knuffel aka Tummy Tom and the Lost Teddy Bear', market: '2024.0', appleId: null },
+    { title: 'Chinas', market: '2023.0', appleId: null },
+    { title: 'We Work for the Dead', market: '2024.0', appleId: 1852029026 },
+    { title: 'Hold The Fort', market: '2025.0', appleId: null },
+  ],
+  '2026-10-15': [
+    { title: 'Dikkie Dik 2: Een nieuwe vriend voor Dikkie Dik aka A New friend for Tummy Tom', market: '2024.0', appleId: null },
+    { title: 'Let Her Kill You', market: '2023.0', appleId: null },
+    { title: 'Los Destellos aka Glimmers', market: '2024.0', appleId: null },
+    { title: 'Goldilocks', market: '2025.0', appleId: null },
+    { title: 'Fast Atlanta', market: '2024.0', appleId: null },
+    { title: 'New Me', market: '2025.0', appleId: 1870653303 },
+    { title: 'The Collector: You Are Next aka La Coleccionista: Ha Llegado Tu Hora', market: '2025.0', appleId: null },
+  ],
+  '2026-10-22': [
+    { title: 'Run Or Fight aka Lóve 2', market: '2024.0', appleId: null },
+    { title: 'Everybody Loves Touda', market: '2024.0', appleId: null },
+  ],
+  '2026-10-29': [
+    { title: 'Canadian, Sniper', market: '2024.0', appleId: null },
+    { title: 'Traumnovelle', market: '2024.0', appleId: null },
+    { title: 'Casino', market: '2023.0', appleId: null },
+    { title: 'The Bachelorette Party 2 aka Addio al Nubilato 2', market: '2023.0', appleId: null },
   ],
 };
 const PROMOTIONS = [
