@@ -793,6 +793,21 @@
       font-family: inherit;
     }
 
+    .add-id-btn {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(10,132,255,0.1);
+      border: 1px dashed var(--blue-border);
+      color: var(--blue);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .add-id-btn:hover { background: rgba(10,132,255,0.22); }
+
+    .id-edit-form { margin-top: 4px; }
+
     .del-btn {
       margin-left: auto;
       width: 22px;
@@ -1463,8 +1478,15 @@ function openDayPanel(key) {
               <div class="mi-name">${r.title}</div>
               <div class="tags">
                 ${marketTag(r.market)}
-                ${r.appleId ? `<span class="tag-id">ID: ${r.appleId}</span>` : ''}
+                ${r.appleId ? `<span class="tag-id">ID: ${r.appleId}</span>` : `<button class="add-id-btn" onclick="startEditId('${safeTitle}','${fromDate}')" title="Add Apple ID">＋ ID</button>`}
                 ${customBadge}${movedBadge}
+              </div>
+              <div id="id-edit-${safeTitle.replace(/\s/g,'_')}" class="id-edit-form" style="display:none;">
+                <input class="add-input" type="text" placeholder="Apple ID" style="margin:6px 0 4px;font-size:12px;" id="id-input-${safeTitle.replace(/\s/g,'_')}" />
+                <div style="display:flex;gap:5px;">
+                  <button class="move-confirm-btn" onclick="saveEditId('${safeTitle}','${fromDate}')">Save</button>
+                  <button class="move-cancel-btn" onclick="cancelEditId('${safeTitle}')">Cancel</button>
+                </div>
               </div>
             </div>
             ${starBtn}${cineBtn}${editBtn}${delBtn}${undoBtn}
@@ -1576,28 +1598,32 @@ function saveMovedReleases(data) {
 }
 
 function getReleasesForDate(key) {
-  const custom = loadCustomReleases();
-  const moved  = loadMovedReleases();
+  const custom    = loadCustomReleases();
+  const moved     = loadMovedReleases();
+  const overrides = loadIdOverrides();
 
-  // Static releases on this date (excluding ones moved away)
+  const applyOverride = r => {
+    if (overrides[r.title]) return { ...r, appleId: overrides[r.title] };
+    return r;
+  };
+
   const staticRels = (RELEASES[key] || [])
     .filter(r => !moved[`${key}|${r.title}`])
-    .map(r => ({ ...r, _type: 'static', _fromDate: key }));
+    .map(r => applyOverride({ ...r, _type: 'static', _fromDate: key }));
 
-  // Static releases moved TO this date from other dates
   const movedHere = [];
   Object.entries(moved).forEach(([mk, newDate]) => {
     if (newDate === key) {
-      const pipeIdx = mk.indexOf('|');
+      const pipeIdx  = mk.indexOf('|');
       const origDate = mk.slice(0, pipeIdx);
       const title    = mk.slice(pipeIdx + 1);
-      const orig = (RELEASES[origDate] || []).find(r => r.title === title);
-      if (orig) movedHere.push({ ...orig, _type: 'moved', _fromDate: origDate, originalDate: origDate });
+      const orig     = (RELEASES[origDate] || []).find(r => r.title === title);
+      if (orig) movedHere.push(applyOverride({ ...orig, _type: 'moved', _fromDate: origDate, originalDate: origDate }));
     }
   });
 
-  // Custom releases for this date
-  const customRels = (custom[key] || []).map((r, i) => ({ ...r, _type: 'custom', _fromDate: key, _customIdx: i }));
+  const customRels = (custom[key] || []).map((r, i) =>
+    applyOverride({ ...r, _type: 'custom', _fromDate: key, _customIdx: i }));
 
   return [...staticRels, ...movedHere, ...customRels];
 }
@@ -1745,6 +1771,47 @@ function openAddPromoPanel() {
 
   document.getElementById('panelBody').innerHTML = body;
   showPanel();
+}
+
+/* ── EDIT APPLE ID ────────────────────────────────────────── */
+function loadIdOverrides() {
+  try { return JSON.parse(localStorage.getItem('idOverrides') || '{}'); }
+  catch { return {}; }
+}
+
+function saveIdOverrides(data) {
+  localStorage.setItem('idOverrides', JSON.stringify(data));
+}
+
+function startEditId(title, fromDate) {
+  const key = title.replace(/\s/g,'_');
+  const form = document.getElementById('id-edit-' + key);
+  if (form) {
+    form.style.display = 'block';
+    const input = document.getElementById('id-input-' + key);
+    if (input) { input.value = ''; input.focus(); }
+  }
+}
+
+function cancelEditId(title) {
+  const key = title.replace(/\s/g,'_');
+  const form = document.getElementById('id-edit-' + key);
+  if (form) form.style.display = 'none';
+}
+
+function saveEditId(title, fromDate) {
+  const key   = title.replace(/\s/g,'_');
+  const input = document.getElementById('id-input-' + key);
+  if (!input || !input.value.trim()) return;
+  const newId = parseInt(input.value.trim());
+  if (isNaN(newId)) { input.focus(); return; }
+
+  const overrides = loadIdOverrides();
+  overrides[title] = newId;
+  saveIdOverrides(overrides);
+  searchIndex = null;
+  render();
+  openDayPanel(selKey);
 }
 
 function addRelease() {
