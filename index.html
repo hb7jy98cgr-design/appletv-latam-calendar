@@ -1402,6 +1402,22 @@ function openDayPanel(key) {
           <div class="id-list-pre">${idsPlain}</div>
         </div>`;
     }
+
+    // ── Copy block for release titles ────────────────────────
+    const relTitles = rels.map(r => r.title);
+    if (relTitles.length) {
+      const titlesPlain = relTitles.join('\n');
+      const titlesEsc   = relTitles.map(t => t.replace(/'/g, "\\'")); 
+      body += `
+        <div class="copy-block" style="border-color:var(--blue-border);background:var(--blue-bg);margin-bottom:14px;">
+          <div class="copy-block-header" style="background:rgba(10,132,255,0.08);">
+            <span class="copy-block-label" style="color:var(--blue);">📋 Release Titles — ${relTitles.length} titles</span>
+            <button class="copy-btn" style="border-color:var(--blue-border);background:var(--blue-bg);color:var(--blue);"
+              onclick="copyText(this, \`${titlesPlain.replace(/`/g, '\\`')}\`)">⎘ Copy All</button>
+          </div>
+          <div class="id-list-pre">${titlesPlain}</div>
+        </div>`;
+    }
     rels.forEach(r => {
       const type      = r._type || 'static';
       const fromDate  = r._fromDate || key;
@@ -1854,6 +1870,17 @@ function copyBlock(p) {
 
 function copyIds(btn, idsArray) {
   const text = idsArray.join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '⎘ Copy All';
+    }, 2000);
+  });
+}
+
+function copyText(btn, text) {
   navigator.clipboard.writeText(text).then(() => {
     btn.classList.add('copied');
     btn.textContent = '✓ Copied!';
