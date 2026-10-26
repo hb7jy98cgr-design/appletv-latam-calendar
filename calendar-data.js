@@ -503,6 +503,34 @@ const RELEASES = {
     { title: 'Casino', market: '2023.0', appleId: null },
     { title: 'The Bachelorette Party 2 aka Addio al Nubilato 2', market: '2023.0', appleId: null },
   ],
+  '2026-11-12': [
+    { title: 'Mary and Max', market: 'MX only', appleId: null },
+    { title: 'The Disappearance of Josef Mengele', market: 'MX only', appleId: null },
+    { title: 'Evil Dress', market: 'MX + PL', appleId: null },
+    { title: 'Stockholm', market: 'MX + PL', appleId: null },
+    { title: 'The Disappearance of Josef Mengele', market: 'MX + PL', appleId: null },
+    { title: 'High Rollers', market: 'MX + PL', appleId: null },
+    { title: 'Young Washington', market: 'MX only', appleId: null },
+  ],
+  '2026-11-16': [
+    { title: 'Sorop', market: 'MX + PL', appleId: null },
+  ],
+  '2026-11-19': [
+    { title: 'Devil\'s Knot', market: 'MX + PL', appleId: null },
+    { title: 'Detective Chinatown 1900', market: 'MX + PL', appleId: null },
+    { title: 'The Weight', market: 'MX + PL', appleId: null },
+  ],
+  '2026-11-20': [
+    { title: 'Rock Bottom', market: 'MX + PL', appleId: null },
+  ],
+  '2026-11-26': [
+    { title: 'Big Girls Don\'t Cry', market: 'MX + PL', appleId: null },
+    { title: 'Fall 2: Deadpoint', market: 'MX + PL', appleId: null },
+    { title: 'Rebound', market: 'MX + PL', appleId: null },
+  ],
+  '2026-11-30': [
+    { title: 'Force of Nature: The Dry 2', market: 'MX + PL', appleId: null },
+  ],
 };
 const PROMOTIONS = [
   {
