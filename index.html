@@ -1424,7 +1424,7 @@ function openDayPanel(key) {
         ${relIds.length ? `<div class="id-list-pre">${idsPlain}</div>` : '<div style="padding:10px 13px;font-size:11px;color:var(--text3);">No IDs yet — use ＋ Bulk to add</div>'}
         <div id="bulk-form-${key}" style="display:none;padding:10px 13px;border-top:1px solid var(--border);">
           <div style="font-size:10px;color:var(--text3);margin-bottom:5px;">Paste IDs — one per line</div>
-          <textarea class="add-textarea" id="bulkIds-${key}" placeholder="1234567890&#10;9876543210&#10;1111111111" style="min-height:80px;font-family:'SF Mono','Menlo',monospace;font-size:12px;"></textarea>
+          <textarea class="add-textarea" id="bulkIds-${key.replace(/-/g,'_')}" placeholder="1234567890&#10;9876543210&#10;1111111111" style="min-height:80px;font-family:'SF Mono','Menlo',monospace;font-size:12px;"></textarea>
           <div style="display:flex;gap:5px;margin-top:5px;">
             <button class="move-confirm-btn" onclick="saveBulkIds('${key}')">💾 Save</button>
             <button class="move-cancel-btn" onclick="toggleBulkForm('${key}')">Cancel</button>
@@ -1844,7 +1844,8 @@ function toggleBulkForm(key) {
 }
 
 function saveBulkIds(key) {
-  const textarea = document.getElementById('bulkIds-' + key);
+  const safeKey = key.replace(/-/g, '_');
+  const textarea = document.getElementById('bulkIds-' + safeKey);
   if (!textarea) return;
   const ids = textarea.value.trim().split('\n')
     .map(l => l.trim())
