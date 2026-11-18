@@ -1410,7 +1410,7 @@ function openDayPanel(key) {
       : rels.map(r => r.appleId).filter(Boolean);
     const isBulk = bulkIdsForDate.length > 0;
     const idsPlain = relIds.join('\n');
-    const idsArr   = relIds.join(',');
+    const idsArr   = relIds.map(id => typeof id === 'string' ? `'${id}'` : id).join(',');
     body += `
       <div class="copy-block" style="border-color:var(--blue-border);background:var(--blue-bg);margin-bottom:14px;">
         <div class="copy-block-header" style="background:rgba(10,132,255,0.08);">
@@ -1849,8 +1849,8 @@ function saveBulkIds(key) {
   if (!textarea) return;
   const ids = textarea.value.trim().split('\n')
     .map(l => l.trim())
-    .filter(l => /^\d+$/.test(l))
-    .map(Number);
+    .filter(l => l.length > 0)
+    .map(l => isNaN(l) ? l : Number(l));
   if (!ids.length) { textarea.focus(); return; }
   const store = loadBulkIds();
   store[key] = ids;
